@@ -1,0 +1,124 @@
+"<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kopi & Snack - Pesan Sekarang</title>
+    <link rel="stylesheet" href="/frontend/css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <h1>☕ Kopi & Snack</h1>
+            <button class="cart-btn" onclick="showCart()" data-testid="cart-button">
+                <span>🛒</span>
+                <span class="cart-count" id="cartCount" data-testid="cart-count">0</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Section: Daftar Menu -->
+        <section id="menuSection" data-testid="menu-section">
+            <h2>Menu Kami</h2>
+            
+            <!-- Category: Coffee -->
+            <div class="category">
+                <h3>☕ Coffee</h3>
+                <div class="menu-grid" id="coffeeMenu"></div>
+            </div>
+
+            <!-- Category: Non-Coffee -->
+            <div class="category">
+                <h3>🥤 Non-Coffee</h3>
+                <div class="menu-grid" id="nonCoffeeMenu"></div>
+            </div>
+
+            <!-- Category: Snack -->
+            <div class="category">
+                <h3>🍰 Snack</h3>
+                <div class="menu-grid" id="snackMenu"></div>
+            </div>
+        </section>
+
+        <!-- Section: Keranjang -->
+        <section id="cartSection" class="hidden" data-testid="cart-section">
+            <div class="section-header">
+                <h2>Keranjang Pesanan</h2>
+                <button class="btn-back" onclick="showMenu()" data-testid="back-to-menu-button">← Kembali</button>
+            </div>
+
+            <div id="cartItems" data-testid="cart-items-container"></div>
+            <div id="emptyCart" class="empty-state hidden" data-testid="empty-cart-message">
+                <p>Keranjang Anda masih kosong</p>
+                <button class="btn-primary" onclick="showMenu()" data-testid="empty-cart-back-button">Mulai Pesan</button>
+            </div>
+
+            <div id="cartSummary" class="cart-summary hidden" data-testid="cart-summary">
+                <div class="summary-row">
+                    <span>Total</span>
+                    <span class="total-price" id="totalPrice" data-testid="total-price">Rp 0</span>
+                </div>
+                <button class="btn-primary btn-full" onclick="showCheckout()" data-testid="proceed-to-checkout-button">Lanjut ke Checkout</button>
+            </div>
+        </section>
+
+        <!-- Section: Checkout -->
+        <section id="checkoutSection" class="hidden" data-testid="checkout-section">
+            <div class="section-header">
+                <h2>Checkout</h2>
+                <button class="btn-back" onclick="showCart()" data-testid="back-to-cart-button">← Kembali</button>
+            </div>
+
+            <form id="checkoutForm" onsubmit="confirmOrder(event)" data-testid="checkout-form">
+                <div class="form-group">
+                    <label for="customerName">Nama Pemesan</label>
+                    <input type="text" id="customerName" required placeholder="Masukkan nama Anda" data-testid="customer-name-input">
+                </div>
+
+                <div class="form-group">
+                    <label for="pickupLocation">Lokasi Pickup</label>
+                    <select id="pickupLocation" required data-testid="pickup-location-select">
+                        <option value="">Pilih lokasi pickup</option>
+                        <option value="Cabang Pusat - Jl. Sudirman No. 123">Cabang Pusat - Jl. Sudirman No. 123</option>
+                    </select>
+                </div>
+
+                <div class="order-summary" data-testid="checkout-order-summary">
+                    <h3>Ringkasan Pesanan</h3>
+                    <div id="checkoutItems" data-testid="checkout-items-list"></div>
+                    <div class="summary-row total">
+                        <span>Total Pembayaran</span>
+                        <span class="total-price" id="checkoutTotal" data-testid="checkout-total-price">Rp 0</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary btn-full" data-testid="confirm-order-button">Konfirmasi Pesanan</button>
+            </form>
+        </section>
+
+        <!-- Section: Konfirmasi -->
+        <section id="confirmationSection" class="hidden" data-testid="confirmation-section">
+            <div class="confirmation-card">
+                <div class="success-icon" data-testid="success-icon">✓</div>
+                <h2>Pesanan Berhasil!</h2>
+                <p data-testid="order-number">Nomor Pesanan: <strong id="orderNumber"></strong></p>
+                <p data-testid="customer-info">Atas nama: <strong id="confirmCustomerName"></strong></p>
+                <p data-testid="pickup-info">Lokasi Pickup: <strong id="confirmPickupLocation"></strong></p>
+                <div class="info-box" data-testid="pickup-instructions">
+                    <p>Silakan ambil pesanan Anda di lokasi yang dipilih.</p>
+                    <p>Tunjukkan nomor pesanan kepada kasir.</p>
+                </div>
+                <button class="btn-primary btn-full" onclick="newOrder()" data-testid="new-order-button">Pesan Lagi</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast hidden" data-testid="toast-notification"></div>
+
+    <script src="buyer.js"></script>
+</body>
+</html>

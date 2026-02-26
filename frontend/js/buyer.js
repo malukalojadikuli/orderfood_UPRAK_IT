@@ -1,87 +1,79 @@
-const menuData = {
-    coffee: [
-        { id: 1, name: 'Menu Contoh 1', price: 25000, category: 'coffee', emoji: '☕' },
-        { id: 2, name: 'Menu Contoh 2', price: 28000, category: 'coffee', emoji: '☕' }
-    ],
-    nonCoffee: [
-        { id: 3, name: 'Menu Contoh 3', price: 22000, category: 'nonCoffee', emoji: '🥤' },
-        { id: 4, name: 'Menu Contoh 4', price: 24000, category: 'nonCoffee', emoji: '🧃' }
-    ],
-    snack: [
-        { id: 5, name: 'Menu Contoh 5', price: 18000, category: 'snack', emoji: '🍰' },
-        { id: 6, name: 'Menu Contoh 6', price: 20000, category: 'snack', emoji: '🥐' }
-    ]
-};
+// ===== CONFIG =====
+const API_URL = 'http://localhost:3000/api';
 
-// State Management - Keranjang disimpan di localStorage
+// ===== STATE =====
+let menuData = { coffee: [], nonCoffee: [], snack: [] };
 let cart = [];
 
-// Initialize App
-document.addEventListener('DOMContentLoaded', function() {
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', function () {
     loadCart();
-    renderMenu();
+    fetchMenu();
     updateCartCount();
 });
 
-// Render Menu ke HTML
-function renderMenu() {
-    // Render Coffee Menu
-    const coffeeContainer = document.getElementById('coffeeMenu');
-    coffeeContainer.innerHTML = menuData.coffee.map(item => createMenuItemHTML(item)).join('');
+// ===== FETCH MENU FROM SERVER =====
+async function fetchMenu() {
+    try {
+        const response = await fetch(`${API_URL}/menu`);
+        const items = await response.json();
 
-    // Render Non-Coffee Menu
-    const nonCoffeeContainer = document.getElementById('nonCoffeeMenu');
-    nonCoffeeContainer.innerHTML = menuData.nonCoffee.map(item => createMenuItemHTML(item)).join('');
+        // Sort items into categories
+        menuData = { coffee: [], nonCoffee: [], snack: [] };
+        items.forEach(item => {
+            if (item.category === 'coffee') menuData.coffee.push(item);
+            else if (item.category === 'nonCoffee') menuData.nonCoffee.push(item);
+            else if (item.category === 'snack') menuData.snack.push(item);
+        });
 
-    // Render Snack Menu
-    const snackContainer = document.getElementById('snackMenu');
-    snackContainer.innerHTML = menuData.snack.map(item => createMenuItemHTML(item)).join('');
+        renderMenu();
+    } catch (error) {
+        showToast('Gagal memuat menu, coba refresh halaman');
+        console.error('fetchMenu error:', error);
+    }
 }
 
-// Create Menu Item HTML
+// ===== RENDER MENU =====
+function renderMenu() {
+    document.getElementById('coffeeMenu').innerHTML =
+        menuData.coffee.map(item => createMenuItemHTML(item)).join('');
+    document.getElementById('nonCoffeeMenu').innerHTML =
+        menuData.nonCoffee.map(item => createMenuItemHTML(item)).join('');
+    document.getElementById('snackMenu').innerHTML =
+        menuData.snack.map(item => createMenuItemHTML(item)).join('');
+}
+
 function createMenuItemHTML(item) {
+    const soldOut = item.stock === 0;
     return `
-        <div class=\"menu-item\" data-testid=\"menu-item-${item.id}\">
-            <div class=\"menu-item-image\">${item.emoji}</div>
-            <div class=\"menu-item-content\">
-                <div class=\"menu-item-name\" data-testid=\"menu-item-name-${item.id}\">${item.name}</div>
-                <div class=\"menu-item-price\" data-testid=\"menu-item-price-${item.id}\">Rp ${formatPrice(item.price)}</div>
-                <button class=\"btn-add\" onclick=\"addToCart(${item.id})\" data-testid=\"add-to-cart-${item.id}\">
-                    Tambah ke Pesanan
-                </button>
+        <div class="menu-item ${soldOut ? 'sold-out-item' : ''}" data-testid="menu-item-${item.id}">
+            <div class="menu-item-image">${item.emoji}</div>
+            <div class="menu-item-content">
+                <div class="menu-item-name" data-testid="menu-item-name-${item.id}">${item.name}</div>
+                <div class="menu-item-price" data-testid="menu-item-price-${item.id}">Rp ${formatPrice(item.price)}</div>
+                ${soldOut
+                    ? `<button class="btn-add" disabled style="background:#ccc;cursor:not-allowed;">Sold Out</button>`
+                    : `<button class="btn-add" onclick="addToCart(${item.id})" data-testid="add-to-cart-${item.id}">Tambah ke Pesanan</button>`
+                }
             </div>
         </div>
     `;
 }
 
-// Format harga ke format Rupiah
-function formatPrice(price) {
-    return price.toLocaleString('id-ID');
-}
-
-// Tambah item ke keranjang
+// ===== CART =====
 function addToCart(itemId) {
-    // Cari item dari semua kategori
     let item = null;
     for (let category in menuData) {
         item = menuData[category].find(m => m.id === itemId);
         if (item) break;
     }
-
     if (!item) return;
 
-    // Cek apakah item sudah ada di keranjang
-    const existingItem = cart.find(cartItem => cartItem.id === itemId);
-    
-    if (existingItem) {
-        existingItem.quantity += 1;
+    const existing = cart.find(c => c.id === itemId);
+    if (existing) {
+        existing.quantity += 1;
     } else {
-        cart.push({
-            id: item.id,
-            name: item.name,
-            price: item.price,
-            quantity: 1
-        });
+        cart.push({ id: item.id, name: item.name, price: item.price, quantity: 1 });
     }
 
     saveCart();
@@ -89,26 +81,21 @@ function addToCart(itemId) {
     showToast(`${item.name} ditambahkan ke keranjang`);
 }
 
-// Update jumlah item di keranjang
 function updateQuantity(itemId, change) {
-    const item = cart.find(cartItem => cartItem.id === itemId);
-    
-    if (item) {
-        item.quantity += change;
-        
-        // Hapus item jika quantity = 0
-        if (item.quantity <= 0) {
-            removeFromCart(itemId);
-            return;
-        }
-        
-        saveCart();
-        renderCart();
-        updateCartCount();
+    const item = cart.find(c => c.id === itemId);
+    if (!item) return;
+
+    item.quantity += change;
+    if (item.quantity <= 0) {
+        removeFromCart(itemId);
+        return;
     }
+
+    saveCart();
+    renderCart();
+    updateCartCount();
 }
 
-// Hapus item dari keranjang
 function removeFromCart(itemId) {
     cart = cart.filter(item => item.id !== itemId);
     saveCart();
@@ -117,7 +104,6 @@ function removeFromCart(itemId) {
     showToast('Item dihapus dari keranjang');
 }
 
-// Render keranjang
 function renderCart() {
     const cartItemsContainer = document.getElementById('cartItems');
     const emptyCart = document.getElementById('emptyCart');
@@ -133,70 +119,122 @@ function renderCart() {
     emptyCart.classList.add('hidden');
     cartSummary.classList.remove('hidden');
 
-    // Render cart items
     cartItemsContainer.innerHTML = cart.map(item => `
-        <div class=\"cart-item\" data-testid=\"cart-item-${item.id}\">
-            <div class=\"cart-item-info\">
-                <h4 data-testid=\"cart-item-name-${item.id}\">${item.name}</h4>
-                <p data-testid=\"cart-item-price-${item.id}\">Rp ${formatPrice(item.price)}</p>
+        <div class="cart-item" data-testid="cart-item-${item.id}">
+            <div class="cart-item-info">
+                <h4>${item.name}</h4>
+                <p>Rp ${formatPrice(item.price)}</p>
             </div>
-            <div class=\"cart-item-actions\">
-                <div class=\"quantity-controls\">
-                    <button class=\"btn-qty\" onclick=\"updateQuantity(${item.id}, -1)\" data-testid=\"decrease-quantity-${item.id}\">−</button>
-                    <span class=\"quantity\" data-testid=\"item-quantity-${item.id}\">${item.quantity}</span>
-                    <button class=\"btn-qty\" onclick=\"updateQuantity(${item.id}, 1)\" data-testid=\"increase-quantity-${item.id}\">+</button>
+            <div class="cart-item-actions">
+                <div class="quantity-controls">
+                    <button class="btn-qty" onclick="updateQuantity(${item.id}, -1)">−</button>
+                    <span class="quantity">${item.quantity}</span>
+                    <button class="btn-qty" onclick="updateQuantity(${item.id}, 1)">+</button>
                 </div>
-                <button class=\"btn-remove\" onclick=\"removeFromCart(${item.id})\" data-testid=\"remove-item-${item.id}\">Hapus</button>
+                <button class="btn-remove" onclick="removeFromCart(${item.id})">Hapus</button>
             </div>
         </div>
     `).join('');
 
-    // Update total
     updateTotal();
 }
 
-// Update total harga
 function updateTotal() {
     const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     document.getElementById('totalPrice').textContent = `Rp ${formatPrice(total)}`;
-    
     const checkoutTotal = document.getElementById('checkoutTotal');
-    if (checkoutTotal) {
-        checkoutTotal.textContent = `Rp ${formatPrice(total)}`;
-    }
+    if (checkoutTotal) checkoutTotal.textContent = `Rp ${formatPrice(total)}`;
 }
 
-// Update jumlah di tombol keranjang
 function updateCartCount() {
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
     document.getElementById('cartCount').textContent = totalItems;
 }
 
-// Simpan keranjang ke localStorage
 function saveCart() {
     localStorage.setItem('cart', JSON.stringify(cart));
 }
 
-// Load keranjang dari localStorage
 function loadCart() {
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) {
-        cart = JSON.parse(savedCart);
+    const saved = localStorage.getItem('cart');
+    if (saved) cart = JSON.parse(saved);
+}
+
+// ===== CHECKOUT =====
+function renderCheckoutItems() {
+    const container = document.getElementById('checkoutItems');
+    container.innerHTML = cart.map(item => `
+        <div class="checkout-item">
+            <span>${item.name} x${item.quantity}</span>
+            <span>Rp ${formatPrice(item.price * item.quantity)}</span>
+        </div>
+    `).join('');
+}
+
+// ===== CONFIRM ORDER - sends to server =====
+async function confirmOrder(event) {
+    event.preventDefault();
+
+    const customerName = document.getElementById('customerName').value;
+    const pickupLocation = document.getElementById('pickupLocation').value;
+
+    if (!customerName || !pickupLocation) {
+        showToast('Mohon lengkapi semua data');
+        return;
+    }
+
+    const orderNumber = 'ORD-' + Date.now().toString().slice(-8);
+    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+    // Build order payload to send to server
+    const orderPayload = {
+        id: orderNumber,
+        customer_name: customerName,
+        pickup_location: pickupLocation,
+        total: total,
+        items: cart.map(item => ({
+            menu_id: item.id,
+            quantity: item.quantity,
+            price: item.price
+        }))
+    };
+
+    try {
+        const response = await fetch(`${API_URL}/orders`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderPayload)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            showToast('Gagal membuat pesanan, coba lagi');
+            console.error(result);
+            return;
+        }
+
+        // Show confirmation
+        document.getElementById('orderNumber').textContent = orderNumber;
+        document.getElementById('confirmCustomerName').textContent = customerName;
+        document.getElementById('confirmPickupLocation').textContent = pickupLocation;
+
+        // Clear cart
+        cart = [];
+        saveCart();
+        updateCartCount();
+
+        hideAllSections();
+        document.getElementById('confirmationSection').classList.remove('hidden');
+        document.getElementById('checkoutForm').reset();
+
+    } catch (error) {
+        showToast('Tidak bisa terhubung ke server');
+        console.error('confirmOrder error:', error);
     }
 }
 
-// Show toast notification dengan animasi smooth
-function showToast(message) {
-    const toast = document.getElementById('toast');
-    toast.textContent = message;
-    toast.classList.remove('hidden');
-    
-    setTimeout(() => {
-        toast.classList.add('hidden');
-    }, 2000);
-}
-
-// Navigation Functions
+// ===== NAVIGATION =====
 function showMenu() {
     hideAllSections();
     document.getElementById('menuSection').classList.remove('hidden');
@@ -213,7 +251,6 @@ function showCheckout() {
         showToast('Keranjang Anda kosong');
         return;
     }
-    
     hideAllSections();
     document.getElementById('checkoutSection').classList.remove('hidden');
     renderCheckoutItems();
@@ -221,57 +258,22 @@ function showCheckout() {
 }
 
 function hideAllSections() {
-    document.getElementById('menuSection').classList.add('hidden');
-    document.getElementById('cartSection').classList.add('hidden');
-    document.getElementById('checkoutSection').classList.add('hidden');
-    document.getElementById('confirmationSection').classList.add('hidden');
+    ['menuSection', 'cartSection', 'checkoutSection', 'confirmationSection']
+        .forEach(id => document.getElementById(id).classList.add('hidden'));
 }
 
-// Render checkout items
-function renderCheckoutItems() {
-    const checkoutItemsContainer = document.getElementById('checkoutItems');
-    checkoutItemsContainer.innerHTML = cart.map(item => `
-        <div class=\"checkout-item\" data-testid=\"checkout-item-${item.id}\">
-            <span data-testid=\"checkout-item-details-${item.id}\">${item.name} x${item.quantity}</span>
-            <span data-testid=\"checkout-item-subtotal-${item.id}\">Rp ${formatPrice(item.price * item.quantity)}</span>
-        </div>
-    `).join('');
-}
-
-// Konfirmasi pesanan
-function confirmOrder(event) {
-    event.preventDefault();
-    
-    const customerName = document.getElementById('customerName').value;
-    const pickupLocation = document.getElementById('pickupLocation').value;
-    
-    if (!customerName || !pickupLocation) {
-        showToast('Mohon lengkapi semua data');
-        return;
-    }
-    
-    // Generate order number
-    const orderNumber = 'ORD-' + Date.now().toString().slice(-8);
-    
-    // Set confirmation data
-    document.getElementById('orderNumber').textContent = orderNumber;
-    document.getElementById('confirmCustomerName').textContent = customerName;
-    document.getElementById('confirmPickupLocation').textContent = pickupLocation;
-    
-    // Clear cart
-    cart = [];
-    saveCart();
-    updateCartCount();
-    
-    // Show confirmation
-    hideAllSections();
-    document.getElementById('confirmationSection').classList.remove('hidden');
-    
-    // Reset form
-    document.getElementById('checkoutForm').reset();
-}
-
-// Mulai pesanan baru
 function newOrder() {
     showMenu();
+}
+
+// ===== UTILS =====
+function formatPrice(price) {
+    return price.toLocaleString('id-ID');
+}
+
+function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.remove('hidden');
+    setTimeout(() => toast.classList.add('hidden'), 2000);
 }

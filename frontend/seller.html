@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kopi & Snack - Seller Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/seller.css">
+</head>
+<body class="seller-body">
+
+    <!-- Header -->
+    <header class="seller-header">
+        <div class="container">
+            <h1>☕ Kopi & Snack <span class="seller-badge">Seller</span></h1>
+            <nav class="seller-nav">
+                <button class="nav-btn active" onclick="showPage('ordersPage')" data-page="ordersPage">
+                    📋 Pesanan
+                    <span class="notif-badge" id="pendingBadge">0</span>
+                </button>
+                <button class="nav-btn" onclick="showPage('menuPage')" data-page="menuPage">🍽️ Menu</button>
+                <button class="nav-btn" onclick="showPage('incomePage')" data-page="incomePage">💰 Pendapatan</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container seller-main">
+
+        <!-- ===== ORDERS PAGE ===== -->
+        <section id="ordersPage" class="seller-page">
+            <div class="page-header">
+                <h2>Pesanan Masuk</h2>
+                <button class="btn-refresh" onclick="loadOrders()">🔄 Refresh</button>
+            </div>
+
+            <!-- Order Tabs -->
+            <div class="order-tabs">
+                <button class="tab-btn active" onclick="filterOrders('pending')" data-tab="pending">⏳ Menunggu</button>
+                <button class="tab-btn" onclick="filterOrders('accepted')" data-tab="accepted">👨‍🍳 Diproses</button>
+                <button class="tab-btn" onclick="filterOrders('ready')" data-tab="ready">✅ Siap</button>
+                <button class="tab-btn" onclick="filterOrders('done')" data-tab="done">🏁 Selesai</button>
+                <button class="tab-btn" onclick="filterOrders('rejected')" data-tab="rejected">❌ Ditolak</button>
+            </div>
+
+            <div id="ordersList"></div>
+            <div id="ordersEmpty" class="empty-state hidden">
+                <p>Tidak ada pesanan di sini</p>
+            </div>
+        </section>
+
+        <!-- ===== MENU PAGE ===== -->
+        <section id="menuPage" class="seller-page hidden">
+            <div class="page-header">
+                <h2>Kelola Menu</h2>
+            </div>
+            <div class="menu-manage-grid" id="menuManageList"></div>
+        </section>
+
+        <!-- ===== INCOME PAGE ===== -->
+        <section id="incomePage" class="seller-page hidden">
+            <div class="page-header">
+                <h2>Pendapatan</h2>
+            </div>
+
+            <div class="income-cards">
+                <div class="income-card">
+                    <div class="income-icon">💰</div>
+                    <div class="income-info">
+                        <span class="income-label">Total Pendapatan</span>
+                        <span class="income-value" id="totalIncome">Rp 0</span>
+                    </div>
+                </div>
+                <div class="income-card">
+                    <div class="income-icon">📦</div>
+                    <div class="income-info">
+                        <span class="income-label">Total Pesanan Selesai</span>
+                        <span class="income-value" id="totalOrders">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="section-subheader">Riwayat Pesanan Selesai</h3>
+            <div id="incomeList"></div>
+            <div id="incomeEmpty" class="empty-state hidden">
+                <p>Belum ada pesanan selesai</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Toast -->
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="js/seller.js"></script>
+</body>
+</html>

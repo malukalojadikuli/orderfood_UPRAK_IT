@@ -12,7 +12,75 @@ app.use(cors());
 app.use(express.json());
 
 // Connect to database
-const db = new Database(path.join(__dirname, 'database/database.db'));
+const dbPath = path.join(__dirname, 'database/database.db');
+const db = new Database(dbPath);
+
+// Initialize database schema if needed
+const initDb = () => {
+    // Create menu table
+    db.exec(`
+        CREATE TABLE IF NOT EXISTS menu (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            price REAL NOT NULL,
+            category TEXT NOT NULL DEFAULT 'coffee',
+            emoji TEXT DEFAULT '☕',
+            stock INTEGER NOT NULL DEFAULT 10,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    `);
+
+    // Create orders table
+    db.exec(`
+        CREATE TABLE IF NOT EXISTS orders (
+            id TEXT PRIMARY KEY,
+            customer_name TEXT NOT NULL,
+            pickup_location TEXT NOT NULL,
+            total REAL NOT NULL,
+            status TEXT DEFAULT 'pending',
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    `);
+
+    // Create order_items table
+    db.exec(`
+        CREATE TABLE IF NOT EXISTS order_items (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            order_id TEXT NOT NULL,
+            menu_id INTEGER NOT NULL,
+            quantity INTEGER NOT NULL,
+            price REAL NOT NULL,
+            FOREIGN KEY (order_id) REFERENCES orders(id),
+            FOREIGN KEY (menu_id) REFERENCES menu(id)
+        )
+    `);
+
+    // Insert sample menu items if table is empty
+    const count = db.prepare('SELECT COUNT(*) as count FROM menu').get().count;
+    if (count === 0) {
+        const insertMenu = db.prepare(`
+            INSERT INTO menu (name, price, category, emoji, stock)
+            VALUES (?, ?, ?, ?, ?)
+        `);
+
+        // Coffee
+        insertMenu.run('Espresso', 25000, 'coffee', '☕', 10);
+        insertMenu.run('Cappuccino', 32000, 'coffee', '☕', 10);
+        insertMenu.run('Latte', 35000, 'coffee', '☕', 10);
+
+        // Non-Coffee
+        insertMenu.run('Teh Manis', 5000, 'nonCoffee', '🥤', 50);
+        insertMenu.run('Jus Jeruk', 15000, 'nonCoffee', '🥤', 20);
+        insertMenu.run('Smoothie', 28000, 'nonCoffee', '🥤', 15);
+
+        // Snack
+        insertMenu.run('Kue Coklat', 20000, 'snack', '🍰', 15);
+        insertMenu.run('Croissant', 18000, 'snack', '🍰', 12);
+        insertMenu.run('Donut', 12000, 'snack', '🍰', 25);
+    }
+};
+
+initDb();
 
 // Serve frontend files
 app.use(express.static(path.join(__dirname, '../frontend')));

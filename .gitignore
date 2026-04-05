@@ -1,2 +1,5 @@
 node_modules/
-database.db
+# keep database.db but ignore any backup files
+*.db-journal
+*.db-wal
+*.db-shm

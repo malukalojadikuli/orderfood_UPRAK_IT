@@ -2,7 +2,7 @@
 const API_URL = window.location.origin + '/api';
 
 // ===== STATE =====
-let menuData = { coffee: [], nonCoffee: [], snack: [] };
+let menuItems = [];
 let cart = [];
 
 // ===== INIT =====
@@ -16,16 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
 async function fetchMenu() {
     try {
         const response = await fetch(`${API_URL}/menu`);
-        const items = await response.json();
-
-        // Sort items into categories
-        menuData = { coffee: [], nonCoffee: [], snack: [] };
-        items.forEach(item => {
-            if (item.category === 'coffee') menuData.coffee.push(item);
-            else if (item.category === 'nonCoffee') menuData.nonCoffee.push(item);
-            else if (item.category === 'snack') menuData.snack.push(item);
-        });
-
+        menuItems = await response.json();
         renderMenu();
     } catch (error) {
         showToast('Gagal memuat menu, coba refresh halaman');
@@ -35,12 +26,8 @@ async function fetchMenu() {
 
 // ===== RENDER MENU =====
 function renderMenu() {
-    document.getElementById('coffeeMenu').innerHTML =
-        menuData.coffee.map(item => createMenuItemHTML(item)).join('');
-    document.getElementById('nonCoffeeMenu').innerHTML =
-        menuData.nonCoffee.map(item => createMenuItemHTML(item)).join('');
-    document.getElementById('snackMenu').innerHTML =
-        menuData.snack.map(item => createMenuItemHTML(item)).join('');
+    document.getElementById('menuGrid').innerHTML =
+        menuItems.map(item => createMenuItemHTML(item)).join('');
 }
 
 function createMenuItemHTML(item) {
@@ -62,11 +49,7 @@ function createMenuItemHTML(item) {
 
 // ===== CART =====
 function addToCart(itemId) {
-    let item = null;
-    for (let category in menuData) {
-        item = menuData[category].find(m => m.id === itemId);
-        if (item) break;
-    }
+    const item = menuItems.find(m => m.id === itemId);
     if (!item) return;
 
     const existing = cart.find(c => c.id === itemId);

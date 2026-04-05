@@ -55,28 +55,25 @@ const initDb = () => {
         )
     `);
 
-    // Insert sample menu items if table is empty
+    // Insert default menu if table is empty (single flat menu, no category sections in UI)
     const count = db.prepare('SELECT COUNT(*) as count FROM menu').get().count;
     if (count === 0) {
         const insertMenu = db.prepare(`
             INSERT INTO menu (name, price, category, emoji, stock)
             VALUES (?, ?, ?, ?, ?)
         `);
-
-        // Coffee
-        insertMenu.run('Espresso', 25000, 'coffee', '☕', 10);
-        insertMenu.run('Cappuccino', 32000, 'coffee', '☕', 10);
-        insertMenu.run('Latte', 35000, 'coffee', '☕', 10);
-
-        // Non-Coffee
-        insertMenu.run('Teh Manis', 5000, 'nonCoffee', '🥤', 50);
-        insertMenu.run('Jus Jeruk', 15000, 'nonCoffee', '🥤', 20);
-        insertMenu.run('Smoothie', 28000, 'nonCoffee', '🥤', 15);
-
-        // Snack
-        insertMenu.run('Kue Coklat', 20000, 'snack', '🍰', 15);
-        insertMenu.run('Croissant', 18000, 'snack', '🍰', 12);
-        insertMenu.run('Donut', 12000, 'snack', '🍰', 25);
+        const rows = [
+            ['Latte', 35000, 'menu', '☕', 10],
+            ['Americano', 28000, 'menu', '☕', 10],
+            ['Croissant', 22000, 'menu', '🥐', 10],
+            ['Chocolate Bread', 18000, 'menu', '🍞', 10],
+            ['Choco Chip Cookies', 15000, 'menu', '🍪', 10],
+            ['Waffles', 32000, 'menu', '🧇', 10],
+            ['Beef Wellington', 95000, 'menu', '🥩', 10],
+            ['Spaghetti', 45000, 'menu', '🍝', 10],
+            ['Prima Gelas', 1000, 'menu', '☕', 10],
+        ];
+        rows.forEach((r) => insertMenu.run(...r));
     }
 };
 

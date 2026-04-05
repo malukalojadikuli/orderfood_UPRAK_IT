@@ -169,7 +169,6 @@ async function confirmOrder(event) {
     const orderNumber = 'ORD-' + Date.now().toString().slice(-8);
     const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
-    // Build order payload to send to server
     const orderPayload = {
         id: orderNumber,
         customer_name: customerName,
@@ -197,19 +196,12 @@ async function confirmOrder(event) {
             return;
         }
 
-        // Show confirmation
-        document.getElementById('orderNumber').textContent = orderNumber;
-        document.getElementById('confirmCustomerName').textContent = customerName;
-        document.getElementById('confirmPickupLocation').textContent = pickupLocation;
-
-        // Clear cart
+        // Clear cart then redirect to the dedicated status page
         cart = [];
         saveCart();
         updateCartCount();
 
-        hideAllSections();
-        document.getElementById('confirmationSection').classList.remove('hidden');
-        document.getElementById('checkoutForm').reset();
+        window.location.href = `status.html?order=${orderNumber}`;
 
     } catch (error) {
         showToast('Tidak bisa terhubung ke server');
@@ -241,12 +233,8 @@ function showCheckout() {
 }
 
 function hideAllSections() {
-    ['menuSection', 'cartSection', 'checkoutSection', 'confirmationSection']
+    ['menuSection', 'cartSection', 'checkoutSection']
         .forEach(id => document.getElementById(id).classList.add('hidden'));
-}
-
-function newOrder() {
-    showMenu();
 }
 
 // ===== UTILS =====

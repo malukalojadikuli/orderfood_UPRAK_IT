@@ -10,7 +10,7 @@
     <!-- Header -->
     <header>
         <div class="container">
-            <h1>☕ Kopi & Snack</h1>
+            <a href="index.html" class="logo-link">☕ Kopi & Snack</a>
             <button class="cart-btn" onclick="showCart()" data-testid="cart-button">
                 <span>🛒</span>
                 <span class="cart-count" id="cartCount" data-testid="cart-count">0</span>
@@ -39,12 +39,15 @@
                 <button class="btn-primary" onclick="showMenu()" data-testid="empty-cart-back-button">Mulai Pesan</button>
             </div>
 
-            <div id="cartSummary" class="cart-summary hidden" data-testid="cart-summary">
-                <div class="summary-row">
-                    <span>Total</span>
-                    <span class="total-price" id="totalPrice" data-testid="total-price">Rp 0</span>
+            <!-- Sticky bottom checkout bar (hidden when cart is empty) -->
+            <div id="cartSummary" class="cart-bar hidden" data-testid="cart-summary">
+                <div class="cart-bar-total">
+                    <span class="cart-bar-label">Total</span>
+                    <span class="cart-bar-price" id="totalPrice" data-testid="total-price">Rp 0</span>
                 </div>
-                <button class="btn-primary btn-full" onclick="showCheckout()" data-testid="proceed-to-checkout-button">Lanjut ke Checkout</button>
+                <button class="cart-bar-btn" onclick="showCheckout()" data-testid="proceed-to-checkout-button">
+                    Lanjut ke Checkout →
+                </button>
             </div>
         </section>
 
@@ -80,22 +83,6 @@
 
                 <button type="submit" class="btn-primary btn-full" data-testid="confirm-order-button">Konfirmasi Pesanan</button>
             </form>
-        </section>
-
-        <!-- Section: Konfirmasi -->
-        <section id="confirmationSection" class="hidden" data-testid="confirmation-section">
-            <div class="confirmation-card">
-                <div class="success-icon" data-testid="success-icon">✓</div>
-                <h2>Pesanan Berhasil!</h2>
-                <p data-testid="order-number">Nomor Pesanan: <strong id="orderNumber"></strong></p>
-                <p data-testid="customer-info">Atas nama: <strong id="confirmCustomerName"></strong></p>
-                <p data-testid="pickup-info">Lokasi Pickup: <strong id="confirmPickupLocation"></strong></p>
-                <div class="info-box" data-testid="pickup-instructions">
-                    <p>Silakan ambil pesanan Anda di lokasi yang dipilih.</p>
-                    <p>Tunjukkan nomor pesanan kepada kasir.</p>
-                </div>
-                <button class="btn-primary btn-full" onclick="newOrder()" data-testid="new-order-button">Pesan Lagi</button>
-            </div>
         </section>
     </main>
 

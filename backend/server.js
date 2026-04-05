@@ -118,6 +118,55 @@ app.patch('/api/menu/:id/soldout', (req, res) => {
     res.json({ success: true, stock: newStock });
 });
 
+// POST /api/menu - add a new menu item
+app.post('/api/menu', (req, res) => {
+    const { name, price, category, emoji, stock } = req.body;
+    if (!name || !price || !category) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+    const result = db.prepare(`
+        INSERT INTO menu (name, price, category, emoji, stock)
+        VALUES (?, ?, ?, ?, ?)
+    `).run(name, price, category, emoji || '☕', stock ?? 10);
+
+    const newItem = db.prepare('SELECT * FROM menu WHERE id = ?').get(result.lastInsertRowid);
+    res.json({ success: true, item: newItem });
+});
+
+// PUT /api/menu/:id - edit a menu item
+app.put('/api/menu/:id', (req, res) => {
+    const { id } = req.params;
+    const { name, price, category, emoji, stock } = req.body;
+
+    const item = db.prepare('SELECT * FROM menu WHERE id = ?').get(id);
+    if (!item) return res.status(404).json({ error: 'Menu not found' });
+
+    db.prepare(`
+        UPDATE menu SET name = ?, price = ?, category = ?, emoji = ?, stock = ?
+        WHERE id = ?
+    `).run(
+        name   ?? item.name,
+        price  ?? item.price,
+        category ?? item.category,
+        emoji  ?? item.emoji,
+        stock  ?? item.stock,
+        id
+    );
+
+    const updated = db.prepare('SELECT * FROM menu WHERE id = ?').get(id);
+    res.json({ success: true, item: updated });
+});
+
+// DELETE /api/menu/:id - delete a menu item
+app.delete('/api/menu/:id', (req, res) => {
+    const { id } = req.params;
+    const item = db.prepare('SELECT * FROM menu WHERE id = ?').get(id);
+    if (!item) return res.status(404).json({ error: 'Menu not found' });
+
+    db.prepare('DELETE FROM menu WHERE id = ?').run(id);
+    res.json({ success: true });
+});
+
 
 // ===== ORDER ROUTES =====
 
@@ -148,13 +197,26 @@ app.post('/api/orders', (req, res) => {
         return res.status(400).json({ error: 'Missing required fields' });
     }
 
+    // Check stock for every item before saving anything
+    for (const item of items) {
+        const menuItem = db.prepare('SELECT * FROM menu WHERE id = ?').get(item.menu_id);
+        if (!menuItem) {
+            return res.status(400).json({ error: `Menu item ${item.menu_id} not found` });
+        }
+        if (menuItem.stock < item.quantity) {
+            return res.status(400).json({
+                error: `Stok ${menuItem.name} tidak cukup. Tersisa: ${menuItem.stock}`
+            });
+        }
+    }
+
     // Save order
     db.prepare(`
         INSERT INTO orders (id, customer_name, pickup_location, total, status)
         VALUES (?, ?, ?, ?, 'pending')
     `).run(id, customer_name, pickup_location, total);
 
-    // Save each item
+    // Save each item and deduct stock
     const insertItem = db.prepare(`
         INSERT INTO order_items (order_id, menu_id, quantity, price)
         VALUES (?, ?, ?, ?)
@@ -162,6 +224,7 @@ app.post('/api/orders', (req, res) => {
 
     items.forEach(item => {
         insertItem.run(id, item.menu_id, item.quantity, item.price);
+        db.prepare('UPDATE menu SET stock = stock - ? WHERE id = ?').run(item.quantity, item.menu_id);
     });
 
     res.json({ success: true, orderId: id });

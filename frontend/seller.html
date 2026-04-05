@@ -9,7 +9,6 @@
 </head>
 <body class="seller-body">
 
-    <!-- Header -->
     <header class="seller-header">
         <div class="container">
             <h1>☕ Kopi & Snack <span class="seller-badge">Seller</span></h1>
@@ -26,42 +25,29 @@
 
     <main class="container seller-main">
 
-        <!-- ===== ORDERS PAGE ===== -->
+        <!-- ORDERS PAGE -->
         <section id="ordersPage" class="seller-page">
             <div class="page-header">
                 <h2>Pesanan Masuk</h2>
-                <button class="btn-refresh" onclick="loadOrders()">🔄 Refresh</button>
             </div>
-
-            <!-- Order Tabs -->
-            <div class="order-tabs">
-                <button class="tab-btn active" onclick="filterOrders('pending')" data-tab="pending">⏳ Menunggu</button>
-                <button class="tab-btn" onclick="filterOrders('accepted')" data-tab="accepted">👨‍🍳 Diproses</button>
-                <button class="tab-btn" onclick="filterOrders('ready')" data-tab="ready">✅ Siap</button>
-                <button class="tab-btn" onclick="filterOrders('done')" data-tab="done">🏁 Selesai</button>
-                <button class="tab-btn" onclick="filterOrders('rejected')" data-tab="rejected">❌ Ditolak</button>
-            </div>
-
             <div id="ordersList"></div>
             <div id="ordersEmpty" class="empty-state hidden">
-                <p>Tidak ada pesanan di sini</p>
+                <p>Belum ada pesanan masuk</p>
             </div>
         </section>
 
-        <!-- ===== MENU PAGE ===== -->
+        <!-- MENU PAGE -->
         <section id="menuPage" class="seller-page hidden">
             <div class="page-header">
                 <h2>Kelola Menu</h2>
+                <button class="btn-add-menu" onclick="openMenuModal(null)">+ Tambah Menu</button>
             </div>
             <div class="menu-manage-grid" id="menuManageList"></div>
         </section>
 
-        <!-- ===== INCOME PAGE ===== -->
+        <!-- INCOME PAGE -->
         <section id="incomePage" class="seller-page hidden">
-            <div class="page-header">
-                <h2>Pendapatan</h2>
-            </div>
-
+            <div class="page-header"><h2>Pendapatan</h2></div>
             <div class="income-cards">
                 <div class="income-card">
                     <div class="income-icon">💰</div>
@@ -78,18 +64,74 @@
                     </div>
                 </div>
             </div>
-
             <h3 class="section-subheader">Riwayat Pesanan Selesai</h3>
             <div id="incomeList"></div>
-            <div id="incomeEmpty" class="empty-state hidden">
-                <p>Belum ada pesanan selesai</p>
-            </div>
+            <div id="incomeEmpty" class="empty-state hidden"><p>Belum ada pesanan selesai</p></div>
         </section>
 
     </main>
 
-    <!-- Toast -->
     <div id="toast" class="toast hidden"></div>
+
+    <!-- MENU MODAL -->
+    <div id="menuModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="modalTitle">Tambah Menu</h3>
+                <button class="modal-close" onclick="closeMenuModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-field">
+                    <label>Emoji</label>
+                    <input type="text" id="modalEmoji" placeholder="Contoh: ☕ 🥐 🍵" maxlength="4">
+                </div>
+                <div class="modal-field">
+                    <label>Nama Menu</label>
+                    <input type="text" id="modalName" placeholder="Nama menu">
+                </div>
+                <div class="modal-field">
+                    <label>Harga (Rp)</label>
+                    <input type="number" id="modalPrice" placeholder="Contoh: 25000" min="0">
+                </div>
+                <div class="modal-field">
+                    <label>Kategori</label>
+                    <select id="modalCategory">
+                        <option value="coffee">☕ Coffee</option>
+                        <option value="nonCoffee">🥤 Non-Coffee</option>
+                        <option value="snack">🍰 Snack</option>
+                        <option value="menu">🍽️ Menu Umum</option>
+                    </select>
+                </div>
+                <div class="modal-field">
+                    <label>Stok</label>
+                    <input type="number" id="modalStock" placeholder="Contoh: 10" min="0">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-modal-cancel" onclick="closeMenuModal()">Batal</button>
+                <button class="btn-modal-save" onclick="saveMenu()">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DELETE CONFIRM MODAL -->
+    <div id="deleteModal" class="modal-overlay hidden">
+        <div class="modal-card modal-card-sm">
+            <div class="modal-header">
+                <h3>Hapus Menu?</h3>
+                <button class="modal-close" onclick="closeDeleteModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <p style="color:#6d4c41;font-size:0.95rem;">
+                    Menu "<strong id="deleteMenuName"></strong>" akan dihapus permanen dari database.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-modal-cancel" onclick="closeDeleteModal()">Batal</button>
+                <button class="btn-modal-delete" onclick="confirmDelete()">Hapus</button>
+            </div>
+        </div>
+    </div>
 
     <script src="js/seller.js"></script>
 </body>

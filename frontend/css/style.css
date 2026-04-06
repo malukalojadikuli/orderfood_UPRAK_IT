@@ -249,8 +249,8 @@ h2 {
 .quantity-controls {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.8rem;
-    background-color: #efebe9;
     border-radius: 25px;
     padding: 0.3rem 0.6rem;
 }

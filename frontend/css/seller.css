@@ -121,6 +121,7 @@
 /* Order Card — top strip design */
 .order-card {
     background: #fff;
+    width: 285px;
     border-radius: 12px;
     margin-bottom: 1rem;
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
@@ -139,10 +140,12 @@
 .order-card.status-pending  .order-status-strip { background-color: #ff9800; }
 .order-card.status-accepted .order-status-strip { background-color: #2196f3; }
 .order-card.status-ready    .order-status-strip { background-color: #4caf50; }
-.order-card.status-done     .order-status-strip { background-color: #ffc107; }
+.order-card.status-done     .order-status-strip { background-color: hsla(126, 100%, 51%, 0.735); }
 .order-card.status-rejected .order-status-strip { background-color: #f44336; }
 
-.order-card-body { padding: 1.5rem; }
+.order-card-body { 
+    padding: 1.5rem;
+ }
 
 
 .order-card-header {
@@ -220,6 +223,13 @@
     display: flex;
     gap: 0.8rem;
     flex-wrap: wrap;
+}
+
+.orders-list {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    gap: 1rem;
 }
 
 .btn-accept {
@@ -671,3 +681,14 @@
     transition: background-color 0.2s;
 }
 .btn-modal-delete:hover { background-color: #c62828; }
+
+.menu-item-image {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.completed-orders-header {
+    width: 100vw;
+}

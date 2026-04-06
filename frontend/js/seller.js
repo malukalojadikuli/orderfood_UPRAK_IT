@@ -41,20 +41,43 @@ function renderOrders() {
     const list  = document.getElementById('ordersList');
     const empty = document.getElementById('ordersEmpty');
 
-    // Show active orders only (not done/rejected)
+    // Separate active and completed orders
     const active = orders.filter(o => o.status !== 'done' && o.status !== 'rejected');
+    const completed = orders.filter(o => o.status === 'done');
 
-    if (active.length === 0) {
+    if (active.length === 0 && completed.length === 0) {
         list.innerHTML = '';
         empty.classList.remove('hidden');
         return;
     }
 
     empty.classList.add('hidden');
-    // Sort: pending first, then accepted, then ready
+
+    // Sort active: pending first, then accepted, then ready
     const order = { pending: 0, accepted: 1, ready: 2 };
     active.sort((a, b) => (order[a.status] ?? 9) - (order[b.status] ?? 9));
-    list.innerHTML = active.map(o => createOrderCard(o)).join('');
+
+    // Sort completed by created_at descending (newest first)
+    completed.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+    let html = '';
+
+    // Active orders
+    if (active.length > 0) {
+        html += active.map(o => createOrderCard(o)).join('');
+    }
+
+    // Completed orders section
+    if (completed.length > 0) {
+        html += `
+            <div class="completed-orders-header">
+                <h3>Pesanan Selesai</h3>
+            </div>
+        `;
+        html += completed.map(o => createOrderCard(o)).join('');
+    }
+
+    list.innerHTML = html;
 }
 
 function createOrderCard(order) {
@@ -62,6 +85,7 @@ function createOrderCard(order) {
         pending:  'Menunggu',
         accepted: 'Diproses',
         ready:    'Siap Diambil',
+        done:     'Selesai',
     };
 
     const itemsHTML = order.items.map(item => `
@@ -169,7 +193,7 @@ function createMenuCard(item) {
     return `
         <div class="menu-manage-card ${isSoldOut ? 'sold-out' : ''}" id="menu-card-${item.id}">
             <div class="menu-card-top">
-                <div class="menu-emoji-large">${item.emoji}</div>
+                <img src="${item.imageUrl}" alt="${item.name}" class="menu-item-image" data-testid="menu-item-image-${item.id}">
                 <div class="menu-card-info">
                     <h3>${item.name}</h3>
                     <p>Rp ${formatPrice(item.price)}</p>
@@ -230,7 +254,7 @@ function openMenuModal(menuId) {
     if (menuId === null) {
         // Adding new
         title.textContent = 'Tambah Menu Baru';
-        document.getElementById('modalEmoji').value    = '';
+        document.getElementById('modalImage').value    = '';
         document.getElementById('modalName').value     = '';
         document.getElementById('modalPrice').value    = '';
         document.getElementById('modalCategory').value = 'coffee';
@@ -240,7 +264,7 @@ function openMenuModal(menuId) {
         const item = menuItems.find(m => m.id === menuId);
         if (!item) return;
         title.textContent = 'Edit Menu';
-        document.getElementById('modalEmoji').value    = item.emoji    || '';
+        document.getElementById('modalImage').value    = item.image    || '';
         document.getElementById('modalName').value     = item.name     || '';
         document.getElementById('modalPrice').value    = item.price    || '';
         document.getElementById('modalCategory').value = item.category || 'coffee';
@@ -256,7 +280,7 @@ function closeMenuModal() {
 }
 
 async function saveMenu() {
-    const emoji    = document.getElementById('modalEmoji').value.trim()  || '☕';
+    const image    = document.getElementById('modalImage').value.trim()  || 'default.jpg';
     const name     = document.getElementById('modalName').value.trim();
     const price    = parseInt(document.getElementById('modalPrice').value);
     const category = document.getElementById('modalCategory').value;
@@ -267,7 +291,7 @@ async function saveMenu() {
         return;
     }
 
-    const payload = { name, price, category, emoji, stock };
+    const payload = { name, price, category, image, stock };
 
     try {
         let response;

@@ -32,16 +32,46 @@ function renderMenu() {
 
 function createMenuItemHTML(item) {
     const soldOut = item.stock === 0;
+    const cartItem = cart.find(c => c.id === item.id);
+    const inCart = !!cartItem;
+
+    if (soldOut) {
+        return `
+            <div class="menu-item sold-out-item" data-testid="menu-item-${item.id}">
+                <img src="${item.imageUrl}" alt="${item.name}" class="menu-item-image" data-testid="menu-item-image-${item.id}">
+                <div class="menu-item-content">
+                    <div class="menu-item-name" data-testid="menu-item-name-${item.id}">${item.name}</div>
+                    <div class="menu-item-price" data-testid="menu-item-price-${item.id}">Rp ${formatPrice(item.price)}</div>
+                    <button class="btn-add" disabled style="background:#ccc;cursor:not-allowed;">Sold Out</button>
+                </div>
+            </div>
+        `;
+    }
+
+    if (inCart) {
+        return `
+            <div class="menu-item" data-testid="menu-item-${item.id}">
+                <img src="${item.imageUrl}" alt="${item.name}" class="menu-item-image" data-testid="menu-item-image-${item.id}">
+                <div class="menu-item-content">
+                    <div class="menu-item-name" data-testid="menu-item-name-${item.id}">${item.name}</div>
+                    <div class="menu-item-price" data-testid="menu-item-price-${item.id}">Rp ${formatPrice(item.price)}</div>
+                    <div class="quantity-controls">
+                        <button class="btn-qty" onclick="updateQuantity(${item.id}, -1)">−</button>
+                        <span class="quantity">${cartItem.quantity}</span>
+                        <button class="btn-qty" onclick="updateQuantity(${item.id}, 1)">+</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
     return `
-        <div class="menu-item ${soldOut ? 'sold-out-item' : ''}" data-testid="menu-item-${item.id}">
+        <div class="menu-item" data-testid="menu-item-${item.id}">
             <img src="${item.imageUrl}" alt="${item.name}" class="menu-item-image" data-testid="menu-item-image-${item.id}">
             <div class="menu-item-content">
                 <div class="menu-item-name" data-testid="menu-item-name-${item.id}">${item.name}</div>
                 <div class="menu-item-price" data-testid="menu-item-price-${item.id}">Rp ${formatPrice(item.price)}</div>
-                ${soldOut
-                    ? `<button class="btn-add" disabled style="background:#ccc;cursor:not-allowed;">Sold Out</button>`
-                    : `<button class="btn-add" onclick="addToCart(${item.id})" data-testid="add-to-cart-${item.id}">Tambah ke Pesanan</button>`
-                }
+                <button class="btn-add" onclick="addToCart(${item.id})" data-testid="add-to-cart-${item.id}">Tambah ke Pesanan</button>
             </div>
         </div>
     `;
@@ -54,6 +84,10 @@ function addToCart(itemId) {
 
     const existing = cart.find(c => c.id === itemId);
     if (existing) {
+        if (existing.quantity + 1 > item.stock) {
+            showToast(`Stok ${item.name} hanya tersisa ${item.stock}`);
+            return;
+        }
         existing.quantity += 1;
     } else {
         cart.push({ id: item.id, name: item.name, price: item.price, quantity: 1 });
@@ -61,6 +95,7 @@ function addToCart(itemId) {
 
     saveCart();
     updateCartCount();
+    renderMenu();
     showToast(`${item.name} ditambahkan ke keranjang`);
 }
 
@@ -68,7 +103,16 @@ function updateQuantity(itemId, change) {
     const item = cart.find(c => c.id === itemId);
     if (!item) return;
 
-    item.quantity += change;
+    const menuItem = menuItems.find(m => m.id === itemId);
+    if (!menuItem) return;
+
+    const newQuantity = item.quantity + change;
+    if (newQuantity > menuItem.stock) {
+        showToast(`Stok ${item.name} hanya tersisa ${menuItem.stock}`);
+        return;
+    }
+
+    item.quantity = newQuantity;
     if (item.quantity <= 0) {
         removeFromCart(itemId);
         return;
@@ -76,6 +120,7 @@ function updateQuantity(itemId, change) {
 
     saveCart();
     renderCart();
+    renderMenu();
     updateCartCount();
 }
 
@@ -83,6 +128,7 @@ function removeFromCart(itemId) {
     cart = cart.filter(item => item.id !== itemId);
     saveCart();
     renderCart();
+    renderMenu();
     updateCartCount();
     showToast('Item dihapus dari keranjang');
 }

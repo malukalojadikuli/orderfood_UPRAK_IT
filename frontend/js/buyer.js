@@ -34,7 +34,7 @@ function createMenuItemHTML(item) {
     const soldOut = item.stock === 0;
     return `
         <div class="menu-item ${soldOut ? 'sold-out-item' : ''}" data-testid="menu-item-${item.id}">
-            <div class="menu-item-image">${item.emoji}</div>
+            <img src="${item.imageUrl}" alt="${item.name}" class="menu-item-image" data-testid="menu-item-image-${item.id}">
             <div class="menu-item-content">
                 <div class="menu-item-name" data-testid="menu-item-name-${item.id}">${item.name}</div>
                 <div class="menu-item-price" data-testid="menu-item-price-${item.id}">Rp ${formatPrice(item.price)}</div>

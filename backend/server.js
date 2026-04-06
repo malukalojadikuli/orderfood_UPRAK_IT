@@ -10,6 +10,7 @@ const PORT = 3000;
 // Middleware - allows server to read JSON and accept requests from frontend
 app.use(cors());
 app.use(express.json());
+app.use("/images", express.static("public/images"));
 
 // Connect to database
 const dbPath = path.join(__dirname, 'database/database.db');
@@ -24,7 +25,7 @@ const initDb = () => {
             name TEXT NOT NULL,
             price REAL NOT NULL,
             category TEXT NOT NULL DEFAULT 'coffee',
-            emoji TEXT DEFAULT '☕',
+            image TEXT NOT NULL DEFAULT 'default.jpg',
             stock INTEGER NOT NULL DEFAULT 10,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
@@ -63,15 +64,15 @@ const initDb = () => {
             VALUES (?, ?, ?, ?, ?)
         `);
         const rows = [
-            ['Latte', 35000, 'menu', 'latte.jpg', 10],
-            ['Americano', 28000, 'menu', '☕', 10],
-            ['Croissant', 22000, 'menu', '🥐', 10],
-            ['Chocolate Bread', 18000, 'menu', '🍞', 10],
-            ['Choco Chip Cookies', 15000, 'menu', '🍪', 10],
-            ['Waffles', 32000, 'menu', '🧇', 10],
-            ['Beef Wellington', 95000, 'menu', '🥩', 10],
-            ['Spaghetti', 45000, 'menu', '🍝', 10],
-            ['Prima Gelas', 1000, 'menu', '☕', 10],
+            ['Latte', 35000, 'menu', 'latte.jpeg', 10],
+            ['Americano', 28000, 'menu', 'americano.jpeg', 10],
+            ['Croissant', 22000, 'menu', 'croissant.jpg', 10],
+            ['Chocolate Bread', 18000, 'menu', 'chocolatebread.jpg', 10],
+            ['Choco Chip Cookies', 15000, 'menu', 'chocochipcookies.jpg', 10],
+            ['Waffles', 32000, 'menu', 'waffles.jpeg', 10],
+            ['Beef Wellington', 95000, 'menu', 'beefwellington.jpg', 10],
+            ['Spaghetti', 45000, 'menu', 'spaghetti.jpg', 10],
+            ['Prima Gelas', 1000, 'menu', 'primagelas.jpeg', 10],
         ];
         rows.forEach((r) => insertMenu.run(...r));
     }
@@ -90,7 +91,7 @@ app.get('/api/menu', (req, res) => {
     const menu = db.prepare('SELECT * FROM menu').all();
     const menuWImage = menu.map((menu) => ({
         ...menu,
-        imageUrl: `http://localhost:3000/img/${menu.image}`
+        imageUrl: `http://localhost:3000/images/${menu.image}`
     }))
     res.json(menuWImage);
 });

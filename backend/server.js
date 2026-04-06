@@ -59,11 +59,11 @@ const initDb = () => {
     const count = db.prepare('SELECT COUNT(*) as count FROM menu').get().count;
     if (count === 0) {
         const insertMenu = db.prepare(`
-            INSERT INTO menu (name, price, category, emoji, stock)
+            INSERT INTO menu (name, price, category, image, stock)
             VALUES (?, ?, ?, ?, ?)
         `);
         const rows = [
-            ['Latte', 35000, 'menu', '☕', 10],
+            ['Latte', 35000, 'menu', 'latte.jpg', 10],
             ['Americano', 28000, 'menu', '☕', 10],
             ['Croissant', 22000, 'menu', '🥐', 10],
             ['Chocolate Bread', 18000, 'menu', '🍞', 10],
@@ -88,7 +88,11 @@ app.use(express.static(path.join(__dirname, '../frontend')));
 // GET /api/menu - fetch all menu items
 app.get('/api/menu', (req, res) => {
     const menu = db.prepare('SELECT * FROM menu').all();
-    res.json(menu);
+    const menuWImage = menu.map((menu) => ({
+        ...menu,
+        imageUrl: `http://localhost:3000/img/${menu.image}`
+    }))
+    res.json(menuWImage);
 });
 
 // PATCH /api/menu/:id/stock - update stock of a menu item

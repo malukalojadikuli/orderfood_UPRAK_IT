@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function () {
     updateCartCount();
 });
 
-// ===== FETCH MENU FROM SERVER =====
+// ===== ngambil menu dari server =====
 async function fetchMenu() {
     try {
         const response = await fetch(`${API_URL}/menu`);
@@ -200,7 +200,7 @@ function renderCheckoutItems() {
     `).join('');
 }
 
-// ===== CONFIRM ORDER - sends to server =====
+// ===== CONFIRM ORDER - kirim ke server =====
 async function confirmOrder(event) {
     event.preventDefault();
 
@@ -242,7 +242,7 @@ async function confirmOrder(event) {
             return;
         }
 
-        // Clear cart then redirect to the dedicated status page
+        // meghapus cart terus pindah page ke status
         cart = [];
         saveCart();
         updateCartCount();

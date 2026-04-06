@@ -4,14 +4,14 @@ const API_URL = window.location.origin + '/api';
 // ===== STATE =====
 let orders = [];
 let menuItems = [];
-let editingMenuId = null;   // null = adding new, number = editing existing
+let editingMenuId = null;   
 let deletingMenuId = null;
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', function () {
     loadOrders();
     loadMenu();
-    // Auto-refresh orders every 10 seconds
+    // Refresh setiap 10 detik
     setInterval(loadOrders, 10000);
 });
 
@@ -41,7 +41,7 @@ function renderOrders() {
     const list  = document.getElementById('ordersList');
     const empty = document.getElementById('ordersEmpty');
 
-    // Separate active and completed orders
+    // misahin active dan completed orders
     const active = orders.filter(o => o.status !== 'done' && o.status !== 'rejected');
     const completed = orders.filter(o => o.status === 'done');
 
@@ -53,11 +53,9 @@ function renderOrders() {
 
     empty.classList.add('hidden');
 
-    // Sort active: pending first, then accepted, then ready
     const order = { pending: 0, accepted: 1, ready: 2 };
     active.sort((a, b) => (order[a.status] ?? 9) - (order[b.status] ?? 9));
 
-    // Sort completed by created_at descending (newest first)
     completed.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
     let html = '';
@@ -67,7 +65,7 @@ function renderOrders() {
         html += active.map(o => createOrderCard(o)).join('');
     }
 
-    // Completed orders section
+    // order selesai
     if (completed.length > 0) {
         html += `
             <div class="completed-orders-header">
@@ -296,14 +294,14 @@ async function saveMenu() {
     try {
         let response;
         if (editingMenuId === null) {
-            // POST - add new
+            // POST - tambah baru
             response = await fetch(`${API_URL}/menu`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
         } else {
-            // PUT - update existing
+            // PUT - update menu yang sudah ada
             response = await fetch(`${API_URL}/menu/${editingMenuId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
@@ -318,7 +316,7 @@ async function saveMenu() {
 
         showToast(editingMenuId === null ? 'Menu berhasil ditambahkan!' : 'Menu berhasil diperbarui!');
         closeMenuModal();
-        await loadMenu(); // Reload from database
+        await loadMenu(); // Reload dari database
     } catch (error) {
         showToast('Tidak bisa terhubung ke server');
         console.error('saveMenu error:', error);

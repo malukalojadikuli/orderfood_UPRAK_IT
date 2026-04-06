@@ -7,18 +7,17 @@ const path = require('path');
 const app = express();
 const PORT = 3000;
 
-// Middleware - allows server to read JSON and accept requests from frontend
+// Middleware - mengizinkan membaca dan parsing JSON, juga serve gambar statis
 app.use(cors());
 app.use(express.json());
 app.use("/images", express.static("public/images"));
 
-// Connect to database
+// Connect ke database
 const dbPath = path.join(__dirname, 'database/database.db');
 const db = new Database(dbPath);
 
-// Initialize database schema if needed
 const initDb = () => {
-    // Create menu table
+    // buat menu table
     db.exec(`
         CREATE TABLE IF NOT EXISTS menu (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -31,7 +30,7 @@ const initDb = () => {
         )
     `);
 
-    // Create orders table
+    // buat orders table
     db.exec(`
         CREATE TABLE IF NOT EXISTS orders (
             id TEXT PRIMARY KEY,
@@ -43,7 +42,7 @@ const initDb = () => {
         )
     `);
 
-    // Create order_items table
+    // buat order_items table
     db.exec(`
         CREATE TABLE IF NOT EXISTS order_items (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -56,7 +55,6 @@ const initDb = () => {
         )
     `);
 
-    // Insert default menu if table is empty (single flat menu, no category sections in UI)
     const count = db.prepare('SELECT COUNT(*) as count FROM menu').get().count;
     if (count === 0) {
         const insertMenu = db.prepare(`
@@ -86,7 +84,7 @@ app.use(express.static(path.join(__dirname, '../frontend')));
 
 // ===== MENU ROUTES =====
 
-// GET /api/menu - fetch all menu items
+// GET /api/menu - ngambil semua menu items
 app.get('/api/menu', (req, res) => {
     const menu = db.prepare('SELECT * FROM menu').all();
     const menuWImage = menu.map((menu) => ({
@@ -96,7 +94,7 @@ app.get('/api/menu', (req, res) => {
     res.json(menuWImage);
 });
 
-// PATCH /api/menu/:id/stock - update stock of a menu item
+// PATCH /api/menu/:id/stock - update stock menu item
 app.patch('/api/menu/:id/stock', (req, res) => {
     const { id } = req.params;
     const { change } = req.body;
@@ -123,7 +121,7 @@ app.patch('/api/menu/:id/soldout', (req, res) => {
     res.json({ success: true, stock: newStock });
 });
 
-// POST /api/menu - add a new menu item
+// POST /api/menu - tambah menu item baru
 app.post('/api/menu', (req, res) => {
     const { name, price, category, emoji, stock } = req.body;
     if (!name || !price || !category) {
@@ -138,7 +136,7 @@ app.post('/api/menu', (req, res) => {
     res.json({ success: true, item: newItem });
 });
 
-// PUT /api/menu/:id - edit a menu item
+// PUT /api/menu/:id - edit menu item
 app.put('/api/menu/:id', (req, res) => {
     const { id } = req.params;
     const { name, price, category, emoji, stock } = req.body;
@@ -162,7 +160,7 @@ app.put('/api/menu/:id', (req, res) => {
     res.json({ success: true, item: updated });
 });
 
-// DELETE /api/menu/:id - delete a menu item
+// DELETE /api/menu/:id - hapus menu item
 app.delete('/api/menu/:id', (req, res) => {
     const { id } = req.params;
     const item = db.prepare('SELECT * FROM menu WHERE id = ?').get(id);
@@ -175,7 +173,7 @@ app.delete('/api/menu/:id', (req, res) => {
 
 // ===== ORDER ROUTES =====
 
-// GET /api/orders - fetch all orders with their items
+// GET /api/orders - ngambil semua order sama items
 app.get('/api/orders', (req, res) => {
     const orders = db.prepare('SELECT * FROM orders ORDER BY created_at DESC').all();
 
@@ -194,7 +192,7 @@ app.get('/api/orders', (req, res) => {
     res.json(ordersWithItems);
 });
 
-// POST /api/orders - buyer creates a new order
+// POST /api/orders - buyer membuat order baru
 app.post('/api/orders', (req, res) => {
     const { id, customer_name, pickup_location, total, items } = req.body;
 
@@ -202,7 +200,7 @@ app.post('/api/orders', (req, res) => {
         return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // Check stock for every item before saving anything
+    // Cek sebelum menyimpan apa pun
     for (const item of items) {
         const menuItem = db.prepare('SELECT * FROM menu WHERE id = ?').get(item.menu_id);
         if (!menuItem) {
@@ -221,7 +219,7 @@ app.post('/api/orders', (req, res) => {
         VALUES (?, ?, ?, ?, 'pending')
     `).run(id, customer_name, pickup_location, total);
 
-    // Save each item and deduct stock
+    // Save setiap item dan mengurangi stock
     const insertItem = db.prepare(`
         INSERT INTO order_items (order_id, menu_id, quantity, price)
         VALUES (?, ?, ?, ?)

@@ -7,7 +7,6 @@ let lastStatus = null;
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', function () {
-    // Read order ID from URL: status.html?order=ORD-12345678
     const params = new URLSearchParams(window.location.search);
     const orderId = params.get('order');
 
@@ -23,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function () {
     startPolling(orderId);
 });
 
-// ===== LOAD ORDER DETAILS (name, pickup location) =====
+
 async function loadOrderDetails(orderId) {
     try {
         const response = await fetch(`${API_URL}/orders`);
@@ -54,7 +53,6 @@ async function loadOrderDetails(orderId) {
 
 // ===== POLLING =====
 function startPolling(orderId) {
-    // Poll every 5 seconds
     pollingInterval = setInterval(async () => {
         try {
             const response = await fetch(`${API_URL}/orders`);

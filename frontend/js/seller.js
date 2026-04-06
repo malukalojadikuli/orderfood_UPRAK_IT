@@ -211,10 +211,6 @@ function createMenuCard(item) {
                     }
                 </div>
             </div>
-            <div class="menu-card-actions">
-                <button class="btn-edit-menu" onclick="openMenuModal(${item.id})">✏️ Edit</button>
-                <button class="btn-delete-menu" onclick="openDeleteModal(${item.id}, '${item.name.replace(/'/g, "\\'")}')">🗑️ Hapus</button>
-            </div>
         </div>
     `;
 }
@@ -243,34 +239,34 @@ async function adjustStock(menuId, change) {
     }
 }
 
-// ===== MENU MODAL (add / edit) =====
-function openMenuModal(menuId) {
-    editingMenuId = menuId;
-    const modal = document.getElementById('menuModal');
-    const title = document.getElementById('modalTitle');
+// // ===== MENU MODAL (add / edit) =====
+// function openMenuModal(menuId) {
+//     editingMenuId = menuId;
+//     const modal = document.getElementById('menuModal');
+//     const title = document.getElementById('modalTitle');
 
-    if (menuId === null) {
-        // Adding new
-        title.textContent = 'Tambah Menu Baru';
-        document.getElementById('modalImage').value    = '';
-        document.getElementById('modalName').value     = '';
-        document.getElementById('modalPrice').value    = '';
-        document.getElementById('modalCategory').value = 'coffee';
-        document.getElementById('modalStock').value    = '10';
-    } else {
-        // Editing existing
-        const item = menuItems.find(m => m.id === menuId);
-        if (!item) return;
-        title.textContent = 'Edit Menu';
-        document.getElementById('modalImage').value    = item.image    || '';
-        document.getElementById('modalName').value     = item.name     || '';
-        document.getElementById('modalPrice').value    = item.price    || '';
-        document.getElementById('modalCategory').value = item.category || 'coffee';
-        document.getElementById('modalStock').value    = item.stock    ?? 0;
-    }
+//     if (menuId === null) {
+//         // Adding new
+//         title.textContent = 'Tambah Menu Baru';
+//         document.getElementById('modalImage').value    = '';
+//         document.getElementById('modalName').value     = '';
+//         document.getElementById('modalPrice').value    = '';
+//         document.getElementById('modalCategory').value = 'coffee';
+//         document.getElementById('modalStock').value    = '10';
+//     } else {
+//         // Editing existing
+//         const item = menuItems.find(m => m.id === menuId);
+//         if (!item) return;
+//         title.textContent = 'Edit Menu';
+//         document.getElementById('modalImage').value    = item.image    || '';
+//         document.getElementById('modalName').value     = item.name     || '';
+//         document.getElementById('modalPrice').value    = item.price    || '';
+//         document.getElementById('modalCategory').value = item.category || 'coffee';
+//         document.getElementById('modalStock').value    = item.stock    ?? 0;
+//     }
 
-    modal.classList.remove('hidden');
-}
+//     modal.classList.remove('hidden');
+// }
 
 function closeMenuModal() {
     document.getElementById('menuModal').classList.add('hidden');

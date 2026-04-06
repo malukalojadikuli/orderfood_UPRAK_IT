@@ -568,8 +568,8 @@ app.use((err, req, res, next) => {
 
 // ===== START SERVER =====
 const server = app.listen(PORT, () => {
-    console.log(`   Buyer  → http://localhost:${PORT}/index-multiseller.html`);
-    console.log(`   Seller → http://localhost:${PORT}/seller-multiseller.html`);
+    console.log(`   Buyer  → http://localhost:${PORT}/index.html`);
+    console.log(`   Seller → http://localhost:${PORT}/seller.html`);
     console.log(`\n📡 Sellers:`);
     Object.entries(SELLERS).forEach(([id, info]) => {
         console.log(`   ${id} (${info.location}): ${info.password}`);

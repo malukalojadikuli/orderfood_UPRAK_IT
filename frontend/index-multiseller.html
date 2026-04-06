@@ -22,7 +22,18 @@
     <main class="container">
         <!-- Section: Daftar Menu -->
         <section id="menuSection" data-testid="menu-section">
-            <h2>Menu Kami</h2>
+            <h2>Pilih Lokasi Terlebih Dahulu</h2>
+            <div class="location-selector">
+                <div class="location-grid" id="locationGrid"></div>
+            </div>
+        </section>
+
+        <!-- Section: Menu Display (Hidden until location selected) -->
+        <section id="menuDisplaySection" class="hidden" data-testid="menu-section">
+            <div class="menu-section-header">
+                <button class="btn-back" onclick="changeLocation()" data-testid="change-location-button">← Ganti Lokasi</button>
+                <h2>Menu Kami di <span id="selectedLocationName"></span></h2>
+            </div>
             <div class="menu-grid" id="menuGrid"></div>
         </section>
 
@@ -65,11 +76,10 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="pickupLocation">Lokasi Pickup</label>
-                    <select id="pickupLocation" required data-testid="pickup-location-select">
-                        <option value="">Pilih lokasi pickup</option>
-                        <option value="Cabang Pusat - Jl. Sudirman No. 123">Cabang Pusat - Jl. Sudirman No. 123</option>
-                    </select>
+                    <label>Lokasi Pickup</label>
+                    <div class="selected-location-display">
+                        <p id="displayPickupLocation"></p>
+                    </div>
                 </div>
 
                 <div class="order-summary" data-testid="checkout-order-summary">
@@ -89,6 +99,6 @@
     <!-- Toast Notification -->
     <div id="toast" class="toast hidden" data-testid="toast-notification"></div>
 
-    <script src="js/buyer.js"></script>
+    <script src="js/buyer-multiseller.js"></script>
 </body>
 </html>

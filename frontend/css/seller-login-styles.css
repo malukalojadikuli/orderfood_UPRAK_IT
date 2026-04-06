@@ -1,0 +1,326 @@
+/* ===== LOGIN PAGE STYLES ===== */
+
+.login-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #6d4c41 0%, #8d6e63 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.login-page.hidden {
+    display: none !important;
+}
+
+.login-container {
+    width: 100%;
+    max-width: 420px;
+}
+
+.login-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.login-header h1 {
+    font-size: 2rem;
+    color: #4e342e;
+    margin-bottom: 0.5rem;
+}
+
+.seller-badge-text {
+    color: #6d4c41;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.login-card .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.login-card .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #4e342e;
+    font-size: 0.95rem;
+}
+
+.login-card .form-group input {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    border: 2px solid #d7ccc8;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+    background-color: #fff;
+    transition: border-color 0.3s ease;
+}
+
+.login-card .form-group input:focus {
+    outline: none;
+    border-color: #6d4c41;
+}
+
+.btn-login {
+    width: 100%;
+    background: linear-gradient(135deg, #6d4c41 0%, #5d4037 100%);
+    color: #fff;
+    border: none;
+    padding: 0.9rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-bottom: 1.5rem;
+}
+
+.btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(109, 76, 65, 0.3);
+}
+
+.btn-login:active {
+    transform: translateY(0);
+}
+
+.login-hint {
+    background-color: #f5f1ed;
+    border-left: 4px solid #d84315;
+    padding: 1rem;
+    border-radius: 0 8px 8px 0;
+    margin-top: 1.5rem;
+}
+
+.login-hint p {
+    margin: 0.3rem 0;
+    font-size: 0.9rem;
+    color: #5d4037;
+    line-height: 1.5;
+}
+
+.login-hint p strong {
+    color: #4e342e;
+    font-weight: 700;
+}
+
+/* ===== DASHBOARD PAGE ===== */
+
+.dashboard-page {
+    display: block;
+}
+
+.dashboard-page.hidden {
+    display: none !important;
+}
+
+.header-left {
+    flex: 1;
+}
+
+.header-right {
+    flex: 1;
+}
+
+.seller-location {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-top: 0.2rem;
+}
+
+.logout-btn {
+    background-color: rgba(232, 45, 45, 0.2) !important;
+    color: #fff !important;
+}
+
+.logout-btn:hover {
+    background-color: rgba(232, 45, 45, 0.3) !important;
+}
+
+/* ===== LOCATION SELECTOR STYLES ===== */
+
+.location-selector {
+    margin-bottom: 2rem;
+}
+
+.location-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    padding-bottom: 1rem;
+}
+
+.location-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 2rem 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    border: 2px solid transparent;
+}
+
+.location-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px);
+    border-color: #6d4c41;
+}
+
+.location-card:active {
+    transform: translateY(-2px);
+}
+
+.location-icon {
+    font-size: 2.5rem;
+    min-width: 60px;
+    text-align: center;
+}
+
+.location-info {
+    flex: 1;
+}
+
+.location-info h3 {
+    font-size: 1.2rem;
+    color: #4e342e;
+    margin-bottom: 0.3rem;
+    font-weight: 700;
+}
+
+.location-info p {
+    font-size: 0.9rem;
+    color: #8d6e63;
+    margin: 0;
+}
+
+.location-arrow {
+    font-size: 1.5rem;
+    color: #d84315;
+    min-width: 30px;
+    text-align: right;
+    transition: transform 0.3s ease;
+}
+
+.location-card:hover .location-arrow {
+    transform: translateX(8px);
+}
+
+/* ===== MENU SECTION HEADER ===== */
+
+.menu-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    gap: 1rem;
+}
+
+.menu-section-header h2 {
+    margin-bottom: 0;
+    flex: 1;
+}
+
+.selected-location-display {
+    background-color: #f5f1ed;
+    border-left: 4px solid #6d4c41;
+    padding: 1rem;
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 1rem;
+}
+
+.selected-location-display p {
+    margin: 0;
+    color: #4e342e;
+    font-weight: 600;
+}
+
+.selected-location-display small {
+    color: #8d6e63;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+
+@media (max-width: 768px) {
+    .header-left,
+    .header-right {
+        flex: none;
+    }
+
+    .seller-header .container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .seller-location {
+        margin-top: 0.5rem;
+    }
+
+    .location-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .location-card {
+        padding: 1.5rem 1.2rem;
+    }
+
+    .menu-section-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .menu-section-header h2 {
+        width: 100%;
+        order: 2;
+    }
+
+    .btn-back {
+        order: 1;
+    }
+
+    .login-card {
+        padding: 2rem 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .location-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+
+    .location-arrow {
+        text-align: center;
+        min-width: auto;
+    }
+
+    .location-card:hover .location-arrow {
+        transform: translateY(4px);
+    }
+
+    .seller-header .container {
+        text-align: center;
+    }
+
+    .login-card {
+        padding: 1.5rem 1rem;
+    }
+
+    .login-header h1 {
+        font-size: 1.5rem;
+    }
+}
